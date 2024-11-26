@@ -41,3 +41,5 @@ debug.log
 
 # Environment
 .env
+
+.DS_Store
