@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Files{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="mb-0">Upload Excel Files</h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="files" class="form-label">Select Excel Files</label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="files" 
+                                   name="files" 
+                                   multiple 
+                                   accept=".xlsx,.xls"
+                                   required>
+                            <div class="form-text">
+                                <ul class="mb-0">
+                                    <li>You can select multiple files</li>
+                                    <li>Accepted formats: .xlsx, .xls</li>
+                                    <li>Maximum size per file: 5MB</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">
+                                <i class="fas fa-upload me-2"></i>Upload Files
+                            </button>
+                            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Spinner Overlay -->
+                    <div id="spinner-overlay" class="spinner-overlay d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Processing...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Form validation and spinner display
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+                return
+            }
+            
+            // Optionally disable the submit button to prevent multiple clicks
+            var submitBtn = document.getElementById('submit-btn')
+            submitBtn.disabled = true
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...'
+
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+
+// File size validation
+document.getElementById('files').addEventListener('change', function(e) {
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    const files = e.target.files;
+    
+    for(let i = 0; i < files.length; i++) {
+        if(files[i].size > maxSize) {
+            alert(`File "${files[i].name}" is too large. Maximum size is 5MB.`)
+            e.target.value = '' // Clear the input
+            return
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

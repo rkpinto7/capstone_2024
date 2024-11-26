@@ -1,0 +1,484 @@
+{% extends 'base.html' %}
+
+{% block title %}Insights{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* [Your existing CSS styles] */
+    .insight-highlight {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid;
+    }
+    .insight-highlight.strategic {
+        border-left-color: #0d6efd;
+    }
+    .insight-highlight.opportunities {
+        border-left-color: #198754;
+    }
+    .insight-highlight.predictions {
+        border-left-color: #ffc107;
+    }
+    .insight-card {
+        height: 100%;
+        transition: transform 0.2s;
+        margin-bottom: 1rem;
+    }
+    .insight-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #0d6efd;
+    }
+    .trend-indicator {
+        font-size: 1.2rem;
+        margin-left: 0.5rem;
+    }
+    .trend-up { color: #198754; }
+    .trend-down { color: #dc3545; }
+    .insight-highlight ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+    }
+    .insight-highlight ul li {
+        margin-bottom: 0.5rem;
+    }
+    .badge-custom {
+        font-size: 0.9rem;
+        padding: 0.5em 0.7em;
+    }
+    /* Button Styling */
+    .generate-button {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    .generate-button button {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        background-color: #0d6efd;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .generate-button button:hover {
+        background-color: #0b5ed7;
+    }
+    /* Message Styling */
+    .messages {
+        margin-bottom: 1.5rem;
+    }
+    /* Loading Spinner */
+    .spinner {
+        display: none; /* Hidden by default */
+        width: 3rem;
+        height: 3rem;
+        border: 0.5rem solid #f3f3f3;
+        border-top: 0.5rem solid #0d6efd;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 2rem auto;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Disable Generate Button during Loading */
+    .disabled {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Training Analytics Insights</h1>
+
+    <!-- Display Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Generate Insights Button -->
+    <div class="generate-button">
+        <button id="generateInsightsBtn" class="btn btn-primary">Generate Insights</button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="spinner"></div>
+
+    <!-- GPT Insights Section -->
+    <div id="gptInsightsSection" {% if not gpt_insights %}style="display: none;"{% endif %}>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card insight-card">
+                    <div class="card-body">
+                        <!-- Strategic Insights -->
+                        <div class="insight-highlight strategic">
+                            <h5 class="text-primary">Strategic Insights</h5>
+                            <ul id="strategicInsightsList">
+                                {% if gpt_insights and gpt_insights.strategic_insights %}
+                                    {% for insight in gpt_insights.strategic_insights %}
+                                        <li>{{ insight }}</li>
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                        <!-- Improvement Opportunities -->
+                        <div class="insight-highlight opportunities">
+                            <h5 class="text-success">Improvement Opportunities</h5>
+                            <ul id="opportunitiesList">
+                                {% if gpt_insights and gpt_insights.opportunities %}
+                                    {% for opportunity in gpt_insights.opportunities %}
+                                        <li>{{ opportunity }}</li>
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                        <!-- Trend Predictions -->
+                        <div class="insight-highlight predictions">
+                            <h5 class="text-warning">Trend Predictions</h5>
+                            <ul id="predictionsList">
+                                {% if gpt_insights and gpt_insights.predictions %}
+                                    {% for prediction in gpt_insights.predictions %}
+                                        <li>{{ prediction }}</li>
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The rest of your dashboard (charts, tables) remains unchanged -->
+    <!-- Example: Quick Stats Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card insight-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Average Attendance</h5>
+                    <div class="stat-number">{{ avg_attendance }}</div>
+                    <p class="card-text">participants per session</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card insight-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Topics</h5>
+                    <div class="stat-number">{{ total_topics }}</div>
+                    <p class="card-text">unique training topics</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card insight-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Industry Diversity</h5>
+                    <div class="stat-number">{{ industry_diversity }}</div>
+                    <p class="card-text">different industries</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card insight-card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Best Day</h5>
+                    <div class="stat-number">{{ best_day.day_of_week }}</div>
+                    <p class="card-text">highest attendance</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Insights Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card insight-card">
+                <div class="card-header">
+                    <h3>Attendance Patterns</h3>
+                </div>
+                <div class="card-body">
+                    <div class="insight-highlight">
+                        <h6>Best Performing Day</h6>
+                        <p>{{ best_day.day_of_week }} ({{ best_day.average_participants|floatformat:1 }} avg participants)</p>
+                    </div>
+                    <div class="insight-highlight">
+                        <h6>Optimal Time Slots</h6>
+                        <ul class="list-unstyled">
+                            {% for time in best_times %}
+                            <li>{{ time.time_slot }} ({{ time.average_attendance|floatformat:1 }} avg)</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card insight-card">
+                <div class="card-header">
+                    <h3>Topic Performance</h3>
+                </div>
+                <div class="card-body">
+                    <div class="insight-highlight">
+                        <h6>Most Consistent Topics</h6>
+                        <ul class="list-unstyled">
+                            {% for topic in most_consistent_topics %}
+                            <li>{{ topic.topic }} ({{ topic.frequency }} sessions)</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="insight-highlight">
+                        <h6>Hidden Gems (High-Rated, Low Attendance)</h6>
+                        <ul class="list-unstyled">
+                            {% for topic in highest_rated_low_attendance %}
+                            <li>{{ topic.topic }} ({{ topic.average_rating|floatformat:1 }} ★)</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Regional and Industry Insights -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card insight-card">
+                <div class="card-header">
+                    <h3>Regional Highlights</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for region in top_regions %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    {{ region.state }}
+                                    {% if region.county %}
+                                    - {{ region.county }}
+                                    {% endif %}
+                                </h6>
+                                <span class="badge bg-primary badge-custom">{{ region.total_participants }} participants</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card insight-card">
+                <div class="card-header">
+                    <h3>Industry Trends</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for industry in top_growing_industries %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ industry.industry }}</h6>
+                                <span class="badge bg-success badge-custom">
+                                    {{ industry.average_participants|floatformat:1 }} avg participants
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seasonal and Monthly Trends -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card insight-card">
+                <div class="card-header">
+                    <h3>Seasonal Patterns</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for trend in seasonal_insights %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ trend.topic }}</h6>
+                                <div>
+                                    <span class="badge bg-info badge-custom">{{ trend.season }}</span>
+                                    <span class="badge bg-warning text-dark badge-custom">{{ trend.request_count }} requests</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card insight-card">
+                <div class="card-header">
+                    <h3>Monthly Highlights</h3>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for trend in monthly_highlights %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ trend.topic }}</h6>
+                                <div>
+                                    <span class="badge bg-primary badge-custom">Month {{ trend.month }}</span>
+                                    <span class="badge bg-success badge-custom">{{ trend.request_count }} requests</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include Chart.js and any other required scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // Event listener for Generate Insights button
+    document.getElementById('generateInsightsBtn').addEventListener('click', function() {
+        // Disable the button to prevent multiple clicks
+        this.classList.add('disabled');
+        this.innerText = 'Generating...';
+
+        // Show the loading spinner
+        document.getElementById('loadingSpinner').style.display = 'block';
+
+        // Clear previous GPT insights if any
+        const strategicList = document.getElementById('strategicInsightsList');
+        const opportunitiesList = document.getElementById('opportunitiesList');
+        const predictionsList = document.getElementById('predictionsList');
+
+        if (strategicList) strategicList.innerHTML = '';
+        if (opportunitiesList) opportunitiesList.innerHTML = '';
+        if (predictionsList) predictionsList.innerHTML = '';
+
+        // Hide the GPT insights section until new insights are loaded
+        document.getElementById('gptInsightsSection').style.display = 'none';
+
+        // Send AJAX POST request
+        fetch("{% url 'insight' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest' // Important for Django to recognize AJAX
+            },
+            body: JSON.stringify({}) // You can send additional data if needed
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errData => {
+                    throw new Error(errData.message || 'Network response was not ok');
+                });
+            }
+            return response.json()
+        })
+        .then(data => {
+            if (data.success) {
+                // Populate the insights
+                if (strategicList) {
+                    data.insights.strategic_insights.forEach(insight => {
+                        const li = document.createElement('li');
+                        li.textContent = insight;
+                        strategicList.appendChild(li);
+                    });
+                }
+
+                if (opportunitiesList) {
+                    data.insights.opportunities.forEach(opportunity => {
+                        const li = document.createElement('li');
+                        li.textContent = opportunity;
+                        opportunitiesList.appendChild(li);
+                    });
+                }
+
+                if (predictionsList) {
+                    data.insights.predictions.forEach(prediction => {
+                        const li = document.createElement('li');
+                        li.textContent = prediction;
+                        predictionsList.appendChild(li);
+                    });
+                }
+
+                // Show the GPT insights section
+                document.getElementById('gptInsightsSection').style.display = 'block';
+            } else {
+                // Display error message
+                alert('Failed to generate insights: ' + data.message);
+            }
+
+            // Hide the loading spinner
+            document.getElementById('loadingSpinner').style.display = 'none';
+
+            // Re-enable the button
+            const btn = document.getElementById('generateInsightsBtn');
+            btn.classList.remove('disabled');
+            btn.innerText = 'Generate Insights';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while generating insights: ' + error.message);
+
+            // Hide the loading spinner
+            document.getElementById('loadingSpinner').style.display = 'none';
+
+            // Re-enable the button
+            const btn = document.getElementById('generateInsightsBtn');
+            btn.classList.remove('disabled');
+            btn.innerText = 'Generate Insights';
+        });
+    });
+</script>
+{% endblock %}

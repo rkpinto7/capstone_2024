@@ -1,0 +1,63 @@
+<!-- home.html -->
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block extra_css %}
+<!-- Add any additional CSS here -->
+<style>
+    .hero-section {
+        background-color: #f8f9fa;
+        padding: 60px 0;
+        text-align: center;
+    }
+    .features {
+        padding: 40px 0;
+    }
+    .feature-item {
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1 class="display-4">Welcome to Training Analytics</h1>
+        <p class="lead">Empowering your training programs with insightful data analysis.</p>
+        <a href="{% url 'upload_file' %}" class="btn btn-primary btn-lg">Get Started</a>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <div class="row">
+            <!-- Feature 1 -->
+            <div class="col-md-4 feature-item">
+                <h3>Upload & Manage</h3>
+                <p>Easily upload and manage your training files with our intuitive interface.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="col-md-4 feature-item">
+                <h3>Dashboard Insights</h3>
+                <p>Visualize your training data with comprehensive dashboards and reports.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="col-md-4 feature-item">
+                <h3>Advanced Analytics</h3>
+                <p>Leverage advanced analytics to gain deeper insights into your training effectiveness.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Add any additional JavaScript here -->
+<script>
+    // Custom JS can be added here
+</script>
+{% endblock %}
