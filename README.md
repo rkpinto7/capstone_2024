@@ -32,8 +32,8 @@
 
 5. Outside of your class repository, clone one of the class examples and try to run it:
    ```bash
-   git clone https://github.com/cmu-webapps/django-intro.git
-   cd django-intro
+   git clone https://github.com/jamesyiptk/capstone_2024.git
+   cd capstone
    python3 manage.py migrate
    python3 manage.py runserver
    ```
