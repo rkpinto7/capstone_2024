@@ -30,12 +30,21 @@
      python3 -m pip install django
      ```
 
-5. Outside of your class repository, clone one of the class examples and try to run it:
+5. Set OPENAI_API_KEY as environment variable. Visit [https://platform.openai.com/api-keys] to create the API key.
+   - Export as environment variable:
+     ```bash
+     export OPENAI_API_KEY=YOUR_API_KEY
+     ```
+   - Verify the key:
+     ```bash
+     echo $OPENAI_API_KEY
+     ```
+
+6. Run the application:
    ```bash
-   git clone https://github.com/jamesyiptk/capstone_2024.git
    cd capstone
    python3 manage.py migrate
    python3 manage.py runserver
    ```
 
-6. Visit [http://localhost:8000](http://localhost:8000) and verify that the application is working.
+7. Visit [http://localhost:8000](http://localhost:8000) and verify that the application is working.
