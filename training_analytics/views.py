@@ -283,9 +283,9 @@ def generate_gpt_insights(client, data_context):
         - Top regions: {data_context['top_regions_str']}
 
         Please provide:
-        1. 3-4 key strategic insights
-        2. 2-3 improvement opportunities
-        3. 1-2 trend predictions
+        1. 5 strategic insights
+        2. 5 improvement opportunities
+        3. 3 trend predictions
         Keep each point concise and actionable.
         """
 
@@ -297,7 +297,7 @@ def generate_gpt_insights(client, data_context):
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=1000
+            max_tokens=1500
         )
 
         # Parse the response

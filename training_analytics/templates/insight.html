@@ -13,13 +13,13 @@
         border-left: 4px solid;
     }
     .insight-highlight.strategic {
-        border-left-color: #0d6efd;
+        border-left-color: #4b6cce;
     }
     .insight-highlight.opportunities {
-        border-left-color: #198754;
+        border-left-color: #4b6cce;
     }
     .insight-highlight.predictions {
-        border-left-color: #ffc107;
+        border-left-color: #4b6cce;
     }
     .insight-card {
         height: 100%;
@@ -32,7 +32,7 @@
     .stat-number {
         font-size: 2rem;
         font-weight: bold;
-        color: #0d6efd;
+        color: #4b6cce;
     }
     .trend-indicator {
         font-size: 1.2rem;
@@ -117,7 +117,7 @@
 
     <!-- Generate Insights Button -->
     <div class="generate-button">
-        <button id="generateInsightsBtn" class="btn btn-primary">Generate Insights</button>
+        <button id="generateInsightsBtn" style="background-color: #4b6cce; color: white;">Generate Insights</button>
     </div>
 
     <!-- Loading Spinner -->
@@ -131,7 +131,7 @@
                     <div class="card-body">
                         <!-- Strategic Insights -->
                         <div class="insight-highlight strategic">
-                            <h5 class="text-primary">Strategic Insights</h5>
+                            <h5 style="color: #4b6cce">Strategic Insights</h5>
                             <ul id="strategicInsightsList">
                                 {% if gpt_insights and gpt_insights.strategic_insights %}
                                     {% for insight in gpt_insights.strategic_insights %}
@@ -143,7 +143,7 @@
 
                         <!-- Improvement Opportunities -->
                         <div class="insight-highlight opportunities">
-                            <h5 class="text-success">Improvement Opportunities</h5>
+                            <h5 style="color: #4b6cce">Improvement Opportunities</h5>
                             <ul id="opportunitiesList">
                                 {% if gpt_insights and gpt_insights.opportunities %}
                                     {% for opportunity in gpt_insights.opportunities %}
@@ -155,7 +155,7 @@
 
                         <!-- Trend Predictions -->
                         <div class="insight-highlight predictions">
-                            <h5 class="text-warning">Trend Predictions</h5>
+                            <h5 style="color: #4b6cce">Trend Predictions</h5>
                             <ul id="predictionsList">
                                 {% if gpt_insights and gpt_insights.predictions %}
                                     {% for prediction in gpt_insights.predictions %}
