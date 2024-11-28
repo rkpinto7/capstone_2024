@@ -143,7 +143,6 @@ def insight(request):
             }
 
             gpt_insights = generate_gpt_insights(client, data_context)
-            print(f"GPT Insights: {gpt_insights}")
 
             if gpt_insights:
                 # Serialize insights to store in TextFields
@@ -165,7 +164,6 @@ def insight(request):
                     'success': True,
                     'insights': gpt_insights
                 }
-                print(f"Response data: {response_data}")
                 return JsonResponse(response_data)
             else:
                 response_data = {
@@ -294,7 +292,6 @@ def generate_gpt_insights(client, data_context):
             temperature=0.7,
             max_tokens=1000
         )
-        print(response)
 
         # Parse the response
         gpt_insights_raw = response.choices[0].message.content.strip()
@@ -334,7 +331,6 @@ def generate_gpt_insights(client, data_context):
                 if insight:
                     structured_insights[current_section].append(insight)
 
-            print(f"Structured insights: {structured_insights}")
         return structured_insights
 
     except Exception as e:
