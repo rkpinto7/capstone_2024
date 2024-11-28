@@ -97,12 +97,19 @@ def upload_file(request):
 def dashboard(request):
     """Display the analysis results"""
     try:
+        # Filter RegionalParticipation to include only entries with a specified county
+        regional_participation = RegionalParticipation.objects.filter(
+            county__isnull=False
+        ).exclude(
+            county__exact=''
+        ).order_by('-total_participants')[:10]
+
         context = {
             'resource_requests': ResourceRequest.objects.all()[:20],
             'topic_ratings': TopicRating.objects.all()[:40],
             'daily_attendance': DailyAttendance.objects.all(),
             'industry_participation': IndustryParticipation.objects.all()[:10],
-            'regional_participation': RegionalParticipation.objects.all()[:10],
+            'regional_participation': regional_participation,
             'time_slot_attendance': TimeSlotAttendance.objects.all(),
             'topic_frequency': TopicFrequency.objects.all()[:20],
             'monthly_trends': MonthlyTopicTrend.objects.all()[:15],

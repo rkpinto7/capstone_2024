@@ -347,7 +347,7 @@ const industryData = {
 
 // Regional Chart
 const regionalData = {
-    labels: [{% for reg in regional_participation %}'{{ reg.state }}{% if reg.county %} - {{ reg.county }}{% endif %}',{% endfor %}],
+    labels: [{% for reg in regional_participation %}'{{ reg.county|escapejs }}',{% endfor %}],
     datasets: [{
         label: 'Total Participants',
         data: [{% for reg in regional_participation %}{{ reg.total_participants }},{% endfor %}],
