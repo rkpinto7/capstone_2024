@@ -110,7 +110,7 @@ def dashboard(request):
             'daily_attendance': DailyAttendance.objects.all(),
             'industry_participation': IndustryParticipation.objects.all()[:10],
             'regional_participation': regional_participation,
-            'time_slot_attendance': TimeSlotAttendance.objects.all(),
+            'time_slot_attendance': TimeSlotAttendance.objects.all()[:10],
             'topic_frequency': TopicFrequency.objects.all()[:20],
             'monthly_trends': MonthlyTopicTrend.objects.all()[:15],
             'seasonal_trends': SeasonalTopicTrend.objects.all()[:15],
