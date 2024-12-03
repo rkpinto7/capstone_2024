@@ -11,7 +11,9 @@ from django.db.models import Avg
 from openai import OpenAI
 import json
 from django.http import JsonResponse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -390,7 +392,7 @@ def process_evaluation_schedule_files(file_paths):
 
         # If schedule file was uploaded, copy it to the upload directory
         if schedule_file:
-            schedule_save_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / 'PATHS Training Schedule 2016 to 8-2024.xlsx'
+            schedule_save_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / schedule_file.name
             schedule_save_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
             
             # Read and write the schedule file using pandas
@@ -454,10 +456,13 @@ def process_topic_ratings(df):
         # Clear existing data
         TopicRating.objects.all().delete()
 
-        # Load the schedule data using absolute path
-        schedule_file_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / 'PATHS Training Schedule 2016 to 8-2024.xlsx'
-        if not schedule_file_path.exists():
-            raise Exception(f"Schedule file not found at {schedule_file_path}")
+        # Find the schedule file that contains 'PATHS Training Schedule' in the name
+        upload_dir = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH'])
+        schedule_files = list(upload_dir.glob('*PATHS Training Schedule*.xlsx'))
+        
+        if not schedule_files:
+            raise Exception("No PATHS Training Schedule file found in upload directory")
+        schedule_file_path = schedule_files[0]  # Use the first matching file
             
         # Try different engines if one fails
         try:
@@ -661,7 +666,7 @@ def process_calendar_file(calendar_file_paths):
 
         # Save combined calendar data
         if not final_combined_data.empty:
-            combine_calendar_file_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / 'Combined_2018_to_2021_CMU_Training_Calendar.xlsx'
+            combine_calendar_file_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / 'Combined_CMU_Training_Calendar.xlsx'
             final_combined_data.to_excel(str(combine_calendar_file_path.absolute()), index=False)
         
         try:
@@ -852,11 +857,11 @@ def process_schedule_resource_request_files(file_paths):
             raise Exception("Missing required files")
 
         if schedule_file:
-            schedule_save_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / 'PATHS Training Schedule 2016 to 8-2024.xlsx'
+            schedule_save_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / schedule_file
             schedule_save_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
 
         if resource_request_file:
-            resource_request_save_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / 'PATHS Resource Request 9-22 to 8-24.xlsx'
+            resource_request_save_path = Path(settings.TRAINING_ANALYTICS['EXCEL_UPLOAD_PATH']) / resource_request_file
             resource_request_save_path.parent.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
         
         # Read the uploaded excel files
@@ -957,12 +962,6 @@ def generate_and_save_schedule_analytics(ts_data):
                 average_attendance=row['Average Attendance']
             )
 
-        # # Save topic frequency data
-        # for _, row in most_offered_topics_updated.iterrows():
-        #     TopicFrequency.objects.create(
-        #         topic=row['Topic'],
-        #         frequency=row['Frequency']
-        #     )
         for _, row in most_offered_topics_updated.iterrows():
             TopicFrequency.objects.create(
                 topic=str(row['Topic']).strip()[:255],  # Ensure string and length limit
