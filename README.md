@@ -1,6 +1,6 @@
-# Capstone 2024
+# Training Analytics
 
-## Installation
+## Installation (You may skip this step if you don't want to use it locally)
 
 1. Install Python 3 if you haven't done so already.
    - Go to [python.org](https://python.org) for downloads
@@ -31,14 +31,6 @@
      ```
 
 5. Set OPENAI_API_KEY as environment variable. Visit [https://platform.openai.com/api-keys] to create the API key.
-   - Export as environment variable:
-     ```bash
-     export OPENAI_API_KEY=YOUR_API_KEY
-     ```
-   - Verify the key:
-     ```bash
-     echo $OPENAI_API_KEY
-     ```
 
 6. Run the application:
    ```bash
