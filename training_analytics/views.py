@@ -671,6 +671,9 @@ def process_calendar_file(calendar_file_paths):
         
         try:
             tc_data = pd.read_excel(combine_calendar_file_path)
+            for col in tc_data.columns:
+                if tc_data[col].dtype == 'object':
+                    tc_data[col] = tc_data[col].str.strip()
         except Exception as e:
             raise Exception(f"Error reading excel files: {str(e)}")
         
@@ -868,6 +871,12 @@ def process_schedule_resource_request_files(file_paths):
         try:
             ts_data = pd.read_excel(schedule_save_path)
             rr_data = pd.read_excel(resource_request_save_path)
+            for col in ts_data.columns:
+                if ts_data[col].dtype == 'object':
+                    ts_data[col] = ts_data[col].str.strip()
+            for col in rr_data.columns:
+                if rr_data[col].dtype == 'object':
+                    rr_data[col] = rr_data[col].str.strip()
         except Exception as e:
             raise Exception(f"Error reading excel files: {str(e)}")
             
@@ -912,6 +921,7 @@ def average_attendance_by_time(ts_data):
     ].copy()
 
     data_filtered_time["Simplified Time"] = data_filtered_time["Time"].apply(remove_ampm)
+    data_filtered_time["Simplified Time"] = data_filtered_time["Simplified Time"].apply(lambda x: re.sub(r'\s*-\s*', '-', x))
 
     # Re-calculate the average attendance based on the simplified time format
     attendance_simplified_by_time = (
