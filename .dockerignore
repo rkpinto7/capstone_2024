@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.env
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Development/IDE
+.git
+.gitignore
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+Dockerfile
+docker-compose.yml
+.docker/
+
+# Project specific
+debug.log
+*.pyc
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Documentation
+docs/
+*.md
+LICENSE
+
+# Test files
+test*/
+tests/

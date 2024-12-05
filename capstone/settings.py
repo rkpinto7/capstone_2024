@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+from configparser import ConfigParser
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +22,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
+# Read the configuration file
+CONFIG = ConfigParser()
+CONFIG.read(BASE_DIR / "config.ini")
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#a!+v&7(o0($pms*n+@aaz^a#8g&jbvi8vr+*77iy5a!p=&xiv'
+SECRET_KEY = CONFIG.get("Django", "secret")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'ec2-13-58-255-82.us-east-2.compute.amazonaws.com']
 
 
 # Application definition
