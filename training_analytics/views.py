@@ -434,8 +434,18 @@ def process_resource_requests(df):
     resource_requests_df = resource_requests_df.explode('Requested Resources').reset_index(drop=True)
     resource_requests_df['Requested Resources'] = resource_requests_df['Requested Resources'].str.strip()
 
+    # Remove rows with empty or blank values in 'Requested Resources'
+    resource_requests_df = resource_requests_df[resource_requests_df['Requested Resources'] != '']
+
+    # Convert all requested resources to lowercase to handle case-insensitivity
+    resource_requests_df['Requested Resources'] = resource_requests_df['Requested Resources'].str.lower()
+
     # Filter out non-requests
-    non_requests = ["None", "none", "na", "None at this time", "","all","No", "etc", "All", "Na" ,"etc.", "n/a", ".", "-", "None.", "None at this time."]
+    non_requests = [
+        "none", "na", "none at this time", "all", "no", "etc", "n/a", ".", "-", "none.",
+        "none at this time.", "not at this time", "unsure", "nothing", "etc."
+    ]
+    non_requests = [term.strip().lower() for term in non_requests]
     resource_requests_df = resource_requests_df[~resource_requests_df['Requested Resources'].isin(non_requests)]
 
     # Group and count
