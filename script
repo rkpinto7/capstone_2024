@@ -1,0 +1,17 @@
+# Rebuild and redeploy with the new migrations
+docker build --platform linux/amd64 -t capstone:latest .
+docker tag capstone:latest 288761772889.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
+docker push 288761772889.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
+
+# On EC2
+docker stop $(docker ps -q)
+docker rm $(docker ps -aq)
+docker pull 288761772889.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
+
+# Run with environment variable
+docker run -d -p 8000:8000 \
+  -e OPENAI_API_KEY="your-api-key-here" \
+  288761772889.dkr.ecr.us-east-2.amazonaws.com/capstone:latest
+
+# Run migrations in the new container
+docker exec -it $(docker ps -q) python manage.py migrate
