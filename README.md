@@ -65,13 +65,7 @@
    docker push <ECR_URL>/<APP_NAME>:latest
    ```
 
-5. On your EC2 instance, clean up existing containers:
-   ```bash
-   docker stop $(docker ps -q)
-   docker rm $(docker ps -aq)
-   ```
-
-6. Pull and run the new container:
+5. Pull and run the new container:
    ```bash
    # Pull the latest image
    docker pull <ECR_URL>/<APP_NAME>:latest
@@ -82,12 +76,12 @@
      <ECR_URL>/<APP_NAME>:latest
    ```
 
-7. Run migrations in the new container:
+6. Run migrations in the new container:
    ```bash
    docker exec -it $(docker ps -q) python manage.py migrate
    ```
 
-8. Visit your EC2 instance's public URL on port 8000 to verify the deployment:
+7. Visit your EC2 instance's public URL on port 8000 to verify the deployment:
    - Example: `http://<your-ec2-instance-ip>:8000`
 
 Note: Replace the following placeholders with your actual values:
