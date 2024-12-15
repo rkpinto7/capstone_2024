@@ -1,6 +1,6 @@
 # Training Analytics
 
-## Installation (You may skip this step if you don't want to use it locally)
+## Installation
 
 1. Install Python 3 if you haven't done so already.
    - Go to [python.org](https://python.org) for downloads
